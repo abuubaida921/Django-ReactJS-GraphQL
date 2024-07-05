@@ -1,7 +1,7 @@
 import graphene
+from todo import schema
 
-class Query(graphene.ObjectType):
-    name = graphene.String(default_value="Abu Ubaida")
-    title = graphene.String(default_value="Software Engineer")
+class Query(schema.Query, graphene.ObjectType):
+    pass
     
 schema = graphene.Schema(query=Query)
