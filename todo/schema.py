@@ -22,6 +22,19 @@ class CreateTodo(graphene.Mutation):
         todo = Todo(title=title)
         todo.save()
         return CreateTodo(todo=todo)
+    
+class UpdateTodo(graphene.Mutation):
+    todo = graphene.Field(TodoType)
+    class Arguments:
+        id = graphene.Int(required=True)
+        title = graphene.String(required=True)
+    def mutate(self,info,id,title):
+        todo = Todo.objects.get(id=id)
+        todo.title=title
+        todo.save()
+        return UpdateTodo(todo=todo)
+        
 
 class Mutation(graphene.ObjectType):
     create_todo=CreateTodo.Field()
+    update_todo=UpdateTodo.Field()
