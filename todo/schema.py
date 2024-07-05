@@ -13,3 +13,15 @@ class Query(graphene.ObjectType):
         if id:
             return Todo.objects.filter(id=id)
         return Todo.objects.all()
+    
+class CreateTodo(graphene.Mutation):
+    todo = graphene.Field(TodoType)
+    class Arguments:
+        title = graphene.String(required=True)
+    def mutate(self,info,title):
+        todo = Todo(title=title)
+        todo.save()
+        return CreateTodo(todo=todo)
+
+class Mutation(graphene.ObjectType):
+    create_todo=CreateTodo.Field()
