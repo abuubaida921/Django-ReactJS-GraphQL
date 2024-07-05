@@ -33,8 +33,19 @@ class UpdateTodo(graphene.Mutation):
         todo.title=title
         todo.save()
         return UpdateTodo(todo=todo)
+    
+class DeleteTodo(graphene.Mutation):
+    message = graphene.String()
+    
+    class Arguments:
+        id = graphene.Int(required=True)
+    def mutate(self,info,id):
+        todo = Todo.objects.get(id=id)
+        todo.delete()
+        return DeleteTodo(message = f"Id: {id} Deletion Successful")
         
 
 class Mutation(graphene.ObjectType):
     create_todo=CreateTodo.Field()
     update_todo=UpdateTodo.Field()
+    delete_todo=DeleteTodo.Field()
