@@ -12,7 +12,7 @@ class Query(graphene.ObjectType):
     def resolve_todos(self,info, id = None):
         if id:
             return Todo.objects.filter(id=id)
-        return Todo.objects.all()
+        return Todo.objects.all().order_by("-id")
     
 class CreateTodo(graphene.Mutation):
     todo = graphene.Field(TodoType)
