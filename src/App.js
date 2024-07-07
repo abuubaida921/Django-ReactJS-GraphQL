@@ -19,7 +19,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const App = () => {
   const [title, setTitle] = useState("");
-  const [editTodoId, setEditTodoId] = useState(1);
+  const [editTodoId, setEditTodoId] = useState(null);
   const [edittodo, setEdittodo] = useState(false);
   const { loading, error, data } = useQuery(Get_Todo_Query);
   const [createTodo] = useMutation(Add_Todo_Query, {
@@ -34,7 +34,7 @@ const App = () => {
   });
   const [updateTodo] = useMutation(Update_Todo_Query, {
     onCompleted(data) {
-      console.log("update data", data);
+      // console.log("update data", data);
       setTitle("");
       setEdittodo(false);
     },
@@ -52,19 +52,36 @@ const App = () => {
       },
     ],
   });
+  const [deleteTodo] = useMutation(Delete_Todo_Query, {
+    onCompleted(data) {
+      setTitle("");
+      setEdittodo(false);
+    },
+    onError(err) {
+      console.log(
+        "Error details:",
+        err.networkError?.result?.errors || err.message
+      );
+    },
+    refetchQueries: [
+      {
+        query: Get_Todo_Query,
+      },
+    ],
+  });
   const addNewTodo = () => {
     createTodo({ variables: { title: title } });
   };
   const editButtonHandler = (id, title) => {
-    console.log(id);
-    console.log(title);
-
     setEditTodoId(id);
     setTitle(title);
     setEdittodo(true);
   };
   const editATodo = () => {
     updateTodo({ variables: { id: parseInt(editTodoId), title: title } });
+  };
+  const deleteATodo = (id) => {
+    deleteTodo({ variables: { id: parseInt(id) } });
   };
   if (loading) return <h1>Loading Data...</h1>;
   if (error) return <h1>Error Occurred Lading Data...</h1>;
@@ -134,7 +151,7 @@ const App = () => {
                 >
                   <EditIcon color="primary" />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={() => deleteATodo(item?.id)}>
                   <DeleteForeverIcon color="secondary" />
                 </IconButton>
               </ListItemSecondaryAction>
@@ -173,6 +190,13 @@ const Update_Todo_Query = gql`
         title
         date
       }
+    }
+  }
+`;
+const Delete_Todo_Query = gql`
+  mutation DeleteTodo($id: Int!) {
+    deleteTodo(id: $id) {
+      message
     }
   }
 `;
